@@ -74,15 +74,15 @@ function generateMines(id) {
     }
 
     //compare bombList to safe
-    for (c = 0; c < bombList.length; c++) {
-        for (f = 0; f < safe.length; f++) {
+    for (c in bombList) {
+        for (f in safe) {
             if (bombList[c] === safe[f]) {
                 generateMines(id)
             }
         }
     }
 
-    for (c = 0; c < bombList.length; c++) {
+    for (c in bombList){
         addValue(bombList[c])
         document.getElementById(bombList[c]).classList.add('display')
     }
@@ -92,7 +92,7 @@ function generateMines(id) {
 }
 
 function addValue(id) {
-    for (i = 0; cord.length > i; i++) {
+    for (i in cord) {
         x = id.toString().split('_')
         x[0] = parseInt(x[0]) + parseInt(cord[i][0])
         x[1] = parseInt(x[1]) + parseInt(cord[i][1])
@@ -109,7 +109,7 @@ function click(id) {
         firstClick = false
 
         safe.push(id)
-        for (i = 0; cord.length > i; i++) {
+        for (i in cord) {
             x = id.toString().split('_')
             x[0] = parseInt(x[0]) + parseInt(cord[i][0])
             x[1] = parseInt(x[1]) + parseInt(cord[i][1])
@@ -131,12 +131,13 @@ function reveal(id) {
     document.getElementById(id).classList.add('display')
 
     //check for empty squares
-    for (i = 0; adjecent.length > i; i++) {
+    for (i in adjecent) {
         x = id.toString().split('_')
         x[0] = parseInt(x[0]) + parseInt(adjecent[i][0])
         x[1] = parseInt(x[1]) + parseInt(adjecent[i][1])
         if (x[0] >= 0 && x[0] <= 8 && x[1] >= 0 && x[1] <= 8) {
             x = x.join('_')
+            console.log(x)
             if (!document.getElementById(x).classList.contains('display') && !document.getElementById(x).classList.contains('nearby')) {
                 reveal(x)
             }
