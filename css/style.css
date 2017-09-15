@@ -50,9 +50,10 @@ body {
 }
 
 .display {
-    visibility: hidden;
 }
 
 .nearby {
-    filter: sepia();
+}
+
+.bomb {
 }

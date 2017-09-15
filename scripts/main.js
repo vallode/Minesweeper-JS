@@ -7,6 +7,7 @@ function preload(url) {
 }
 
 preload("images/tile.png")
+preload()
 
 /* Initialize */
 

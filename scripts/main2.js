@@ -6,6 +6,9 @@ function preload(url) {
 }
 
 preload("images/tile.png")
+preload("images/empty.png")
+preload("images/full.png")
+document.getElementById('gamespace').oncontextmenu = function() {return false;}
 
 function init() {
     generateField()
@@ -13,27 +16,24 @@ function init() {
 
 var rows = 9
 var columns = 9
+
 var bombs = 10
 
 var firstClick = true;
 
 var bombList = []
 var tileList = []
+var clearedTiles = 0
+
+var numberList = []
+    numberList.length = 256
+    numberList.fill(0)
 var safe = []
+var flagList = []
 
-var cord = [[-1, 1],
-            [0, -1],
-            [1, -1],
-            [-1, 0],
-            [1, 0],
-            [-1, -1],
-            [0, 1],
-            [1, 1]]
-
-var adjecent = [[-1, 0],
-                [1, 0],
-                [0, -1],
-                [0, 1]]
+var cord = [ [-1, -1], [0, -1], [+1, -1],
+             [-1,  0],          [+1, 0],
+             [-1, +1], [0, +1], [+1, +1] ]
 
 function generateField() {
 
@@ -51,7 +51,8 @@ function generateField() {
             tile.id = x + '_' + y
             tileList.push(tile.id)
 
-            tile.onclick = function() { click(this.id) }
+            document.getElementById(tile.id).addEventListener("click", function() { click(this.id) })
+            document.getElementById(tile.id).addEventListener("contextmenu", function() { flag(this.id) })
 
         }
         row.id = ''
@@ -63,12 +64,18 @@ function generateMines(id) {
     console.log("gen")
     bombList = []
     for (z = 0; z < bombs; z++) {
-        x = Math.floor(Math.random() * rows)
-        y = Math.floor(Math.random() * columns)
+        x = Math.floor(Math.random() * columns)
+        y = Math.floor(Math.random() * rows)
         bombId = x + '_' + y
 
         /* if bombid == any of the 8 blocks regen it */
         bombId = bombId.toString()
+        for (i in bombList) {
+            while (bombList[i] == bombId) {
+                console.log("regened duplicate mine")
+                bombId = (Math.floor(Math.random() * columns)) + '_' + (Math.floor(Math.random() * rows))
+            }
+        }
         bombList.push(bombId)
         // add some sort of bomb identifier
     }
@@ -78,17 +85,15 @@ function generateMines(id) {
         for (f in safe) {
             if (bombList[c] === safe[f]) {
                 generateMines(id)
+                return
             }
         }
     }
+    for (z in bombList){
 
-    for (c in bombList){
-        addValue(bombList[c])
-        document.getElementById(bombList[c]).classList.add('display')
+        addValue(bombList[z])
+        document.getElementById(bombList[z]).classList.add('bomb')
     }
-    console.log(bombList)
-    console.log(tileList)
-    console.log(safe)
 }
 
 function addValue(id) {
@@ -96,7 +101,10 @@ function addValue(id) {
         x = id.toString().split('_')
         x[0] = parseInt(x[0]) + parseInt(cord[i][0])
         x[1] = parseInt(x[1]) + parseInt(cord[i][1])
-        if (x[0] >= 0 && x[0] <= 8 && x[1] >= 0 && x[1] <= 8) {
+        if (x[0] >= 0 && x[0] <= (columns - 1) && x[1] >= 0 && x[1] <= (rows - 1)) {
+
+            numberList[(x[0]) + (x[1]*16)] += 1
+            //(x) + (16 * y)
             x = x.join('_')
             document.getElementById(x).classList.add('nearby') //add value
         }
@@ -106,14 +114,12 @@ function addValue(id) {
 function click(id) {
     console.log("click")
     if (firstClick == true) {
-        firstClick = false
-
         safe.push(id)
         for (i in cord) {
             x = id.toString().split('_')
             x[0] = parseInt(x[0]) + parseInt(cord[i][0])
             x[1] = parseInt(x[1]) + parseInt(cord[i][1])
-            if (x[0] >= 0 && x[0] <= 8 && x[1] >= 0 && x[1] <= 8) {
+            if (x[0] >= 0 && x[0] <= (columns - 1) && x[1] >= 0 && x[1] <= (rows - 1)) {
                 x = x.join('_')
                 safe.push(x)
             }
@@ -122,27 +128,128 @@ function click(id) {
         generateMines(id)
 
         reveal(id)
+
+        firstClick = false
     }else {
         reveal(id)
+        checkWin(id)
     }
 }
 
+function flag(id) {
+    console.log("Flag")
+    for (i in flagList) {
+        if (flagList[i] == id ) {
+            flagList.splice(i)
+            document.getElementById(id).src = 'images/tile.png'
+            console.log("Splice Flag")
+            return null
+        }
+    }
+    document.getElementById(id).src = 'images/flag.png'
+    flagList.push(id)
+    console.log("Flag End")
+}
+
 function reveal(id) {
+    for (i in flagList) {
+        if (flagList[i] == id) {
+            return null
+        }
+    }
+
+    for (i in bombList) {
+        if (bombList[i] == id) {
+            loss(id)
+            return null
+        }
+    }
+
+    if (document.getElementById(id).classList.contains('display')) {
+        return null
+    }
     document.getElementById(id).classList.add('display')
+    document.getElementById(id).src = returnImage(id)
+    clearedTiles++
+    console.log(clearedTiles)
+    console.log(tileList.length - bombList.length)
 
     //check for empty squares
-    for (i in adjecent) {
+    //if square is blank empty it
+    //if square has no number empty the squares around it
+
+    if (document.getElementById(id).classList.contains('nearby')) {
+        document.getElementById(id).src = returnImage(id)
+        return null
+    }
+
+    for (i in cord) {
         x = id.toString().split('_')
-        x[0] = parseInt(x[0]) + parseInt(adjecent[i][0])
-        x[1] = parseInt(x[1]) + parseInt(adjecent[i][1])
-        if (x[0] >= 0 && x[0] <= 8 && x[1] >= 0 && x[1] <= 8) {
+        x[0] = parseInt(x[0]) + parseInt(cord[i][0])
+        x[1] = parseInt(x[1]) + parseInt(cord[i][1])
+        if (x[0] >= 0 && x[0] <= (columns - 1) && x[1] >= 0 && x[1] <= (rows - 1)) {
             x = x.join('_')
-            console.log(x)
-            if (!document.getElementById(x).classList.contains('display') && !document.getElementById(x).classList.contains('nearby')) {
-                reveal(x)
+            if (!document.getElementById(x).classList.contains('display') &&
+                !document.getElementById(x).classList.contains('bomb')) {
+                    reveal(x)
             }
         }
     }
+}
+
+function checkWin(id) {
+    if (clearedTiles == (tileList.length - bombList.length)) {
+        win()
+        return null
+    }
+}
+
+function win() {
+    for (i in bombList) {
+        document.getElementById(bombList[i]).src = 'images/flag.png'
+    }
+}
+
+function loss(id) {
+    for (i in bombList) {
+        document.getElementById(bombList[i]).src = 'images/bomb2.png'
+    }
+    document.getElementById(id).src = 'images/bomb.png'
+}
+
+function returnImage(id) {
+    x = id.toString().split('_')
+    x[0] = parseInt(x[0])
+    x[1] = parseInt(x[1])
+    switch (numberList[((x[0]) + (x[1]*16))]) {
+        case 1:
+            imgSrc = 'images/1.png'
+            break
+        case 2:
+            imgSrc = 'images/2.png'
+            break
+        case 3:
+            imgSrc = 'images/3.png'
+            break
+        case 4:
+            imgSrc = 'images/4.png'
+            break
+        case 5:
+            imgSrc = 'images/5.png'
+            break
+        case 6:
+            imgSrc = 'images/6.png'
+            break
+        case 7:
+            imgSrc = 'images/7.png'
+            break
+        case 8:
+            imgSrc = 'images/8.png'
+            break
+        default:
+            imgSrc = 'images/empty.png'
+    }
+    return imgSrc
 }
 
 document.addEventListener("DOMContentLoaded", generateField())
