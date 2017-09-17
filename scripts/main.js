@@ -1,168 +1,166 @@
-/* Pre-load some assets */
+// Main script
 
-function preload(url) {
-    image = new Image()
-    image.src = url
-}
+const rows = 19
+const columns = 30
+const bombs = 99
 
-preload("images/tile.png")
-preload("images/empty.png")
-preload("images/wallSide.png")
-preload("images/1.png")
-preload("images/2.png")
-preload("images/3.png")
-preload("images/4.png")
-preload("images/5.png")
-preload("images/6.png")
-preload("images/7.png")
-preload("images/8.png")
-document.getElementById('gamespace').oncontextmenu = function() {return false;}
-document.getElementById('gamespace').addEventListener('mousedown', function() { faceOoo('face') })
-document.getElementById('gamespace').addEventListener('mouseup', function() { faceUp('face') })
-document.getElementById('face').addEventListener('mousedown', function() { faceDown(this.id) })
-document.getElementById('face').addEventListener('mouseup', function() { faceUp(this.id) })
+var flags = bombs
 
-function init() {
-    generateField()
-}
+var clearedTiles = 0
 
-var rows = 9
-var columns = 9
-
-var bombs = 10
-
-var firstClick = true;
+var firstClick = true
 
 var bombList = []
 var tileList = []
-var clearedTiles = 0
-
-var numberList = []
-    numberList.length = 256
-    numberList.fill(0)
-var safe = []
 var flagList = []
+var safe = []
 
-var cord = [ [-1, -1], [0, -1], [+1, -1],
-             [-1,  0],          [+1, 0],
-             [-1, +1], [0, +1], [+1, +1] ]
+var numberList = new Array((rows * columns))
+    numberList.fill(0)
 
+// Adjacent tiles
+
+var cord = [[-1, -1], [0, -1], [+1, -1],
+            [-1,  0],          [+1, 0],
+            [-1, +1], [0, +1], [+1, +1]]
+
+// Add listeners
+
+function addListeners() {
+    document.getElementById('gamespace').oncontextmenu = function() { return false; }
+    document.getElementById('gamespace').addEventListener('mousedown', faceOoo )
+    document.getElementById('gamespace').addEventListener('mouseup', faceUp )
+    document.getElementById('face').addEventListener('mousedown', faceDown )
+    document.getElementById('face').addEventListener('mouseup', faceUp )
+}
+
+//Generate the tile field
 function generateField() {
+    addListeners()
+    //Iterate through rows
     for (y = 0; y < rows; y++){
+
         row = document.createElement('div')
         row.className = 'row'
         row.id = 'row'
         document.getElementById('gamespace').appendChild(row)
 
         for (x = 0; x < columns; x++) {
+
             tile = document.createElement('img')
             tile.src = 'images/tile.png'
-            document.getElementById('row').appendChild(tile)
-
             tile.id = x + '_' + y
+
             tileList.push(tile.id)
 
-            document.getElementById(tile.id).addEventListener("click", function() { click(this.id) })
-            document.getElementById(tile.id).addEventListener("contextmenu", function() { flag(this.id) })
+            document.getElementById('row').appendChild(tile)
+
+            //Reveal
+            document.getElementById(tile.id).addEventListener('click', click)
+
+            //Flag
+            document.getElementById(tile.id).addEventListener('contextmenu', flag)
 
         }
+        //Reset the row ID to stop tile generator targeting the first row everytime
         row.id = ''
     }
-
+    updateFlag()
 }
 
 function generateMines(id) {
-    console.log("gen")
     bombList = []
     for (z = 0; z < bombs; z++) {
-        x = Math.floor(Math.random() * columns)
-        y = Math.floor(Math.random() * rows)
-        bombId = x + '_' + y
+        bombId = Math.floor(Math.random() * (columns -1)) + '_' + Math.floor(Math.random() * (rows - 1))
 
-        /* if bombid == any of the 8 blocks regen it */
+        // If a bomb has the ID as another bomb, regenerate that bomb
         bombId = bombId.toString()
         for (i in bombList) {
             while (bombList[i] == bombId) {
-                console.log("regened duplicate mine")
-                bombId = (Math.floor(Math.random() * columns)) + '_' + (Math.floor(Math.random() * rows))
+                bombId = (Math.floor(Math.random() * (columns - 1)) + '_' + (Math.floor(Math.random() * (rows - 1))))
             }
         }
         bombList.push(bombId)
-        // add some sort of bomb identifier
     }
 
-    //compare bombList to safe
+    // If a bomb falls within the safe area, regenerate all bombs
     for (c in bombList) {
         for (f in safe) {
             if (bombList[c] === safe[f]) {
                 generateMines(id)
-                return
+                return null
             }
         }
     }
-    for (z in bombList){
 
+    // For each bomb, add a value to the tiles around it
+    for (z in bombList){
         addValue(bombList[z])
-        document.getElementById(bombList[z]).classList.add('bomb')
+        document.getElementById(bombList[z]).classList.add('bomb') // Temp identifier
     }
 }
 
 function addValue(id) {
+    //For each adjacent tile add a value to the corresponding array position
     for (i in cord) {
         x = id.toString().split('_')
         x[0] = parseInt(x[0]) + parseInt(cord[i][0])
         x[1] = parseInt(x[1]) + parseInt(cord[i][1])
-        if (x[0] >= 0 && x[0] <= (columns - 1) && x[1] >= 0 && x[1] <= (rows - 1)) {
-
-            numberList[(x[0]) + (x[1]*16)] += 1
-            //(x) + (16 * y)
+        if (x[0] >= 0 && x[0] < columns && x[1] >= 0 && x[1] < rows) {
+            //(x) + ((columns - 1) * y)
+            numberList[(x[0]) + ((columns) * x[1])] += 1
             x = x.join('_')
-            document.getElementById(x).classList.add('nearby') //add value
+            document.getElementById(x).classList.add('nearby') // Temp identifier
         }
     }
 }
 
-function click(id) {
-    console.log("click")
+// Listeners
+
+function click(event) {
     if (firstClick == true) {
-        safe.push(id)
+        safe.push(event.target.id)
         for (i in cord) {
-            x = id.toString().split('_')
+            x = event.target.id.toString().split('_')
             x[0] = parseInt(x[0]) + parseInt(cord[i][0])
             x[1] = parseInt(x[1]) + parseInt(cord[i][1])
-            if (x[0] >= 0 && x[0] <= (columns - 1) && x[1] >= 0 && x[1] <= (rows - 1)) {
+            if (x[0] >= 0 && x[0] < columns && x[1] >= 0 && x[1] < rows) {
                 x = x.join('_')
                 safe.push(x)
             }
         }
 
-        generateMines(id)
+        generateMines(event.target.id)
 
-        reveal(id)
+        reveal(event.target.id)
+
+        timeStart()
 
         firstClick = false
     }else {
-        reveal(id)
-        checkWin(id)
+        reveal(event.target.id)
+
+        checkWin(event.target.id)
     }
 }
 
-function flag(id) {
-    console.log("Flag")
-    if (document.getElementById(id).classList.contains('display')) {
+function flag(event) {
+    if (document.getElementById(event.target.id).classList.contains('display')) {
         return null
     }
     for (i in flagList) {
-        if (flagList[i] == id ) {
-            flagList.splice(i)
-            document.getElementById(id).src = 'images/tile.png'
-            console.log("Splice Flag")
+        if (flagList[i] == event.target.id ) {
+            flagList.splice(i, 1)
+            flags++
+            document.getElementById(event.target.id).src = 'images/tile.png'
+            updateFlag()
             return null
         }
     }
-    document.getElementById(id).src = 'images/flag.png'
-    flagList.push(id)
-    console.log("Flag End")
+    flagList.push(event.target.id)
+    document.getElementById(event.target.id).src = 'images/flag.png'
+    flags--
+    updateFlag()
 }
 
 function reveal(id) {
@@ -185,13 +183,12 @@ function reveal(id) {
     document.getElementById(id).classList.add('display')
     document.getElementById(id).src = returnImage(id)
     clearedTiles++
-    console.log(clearedTiles)
-    console.log(tileList.length - bombList.length)
 
     //check for empty squares
     //if square is blank empty it
     //if square has no number empty the squares around it
 
+    for (i in )
     if (document.getElementById(id).classList.contains('nearby')) {
         document.getElementById(id).src = returnImage(id)
         return null
@@ -201,7 +198,7 @@ function reveal(id) {
         x = id.toString().split('_')
         x[0] = parseInt(x[0]) + parseInt(cord[i][0])
         x[1] = parseInt(x[1]) + parseInt(cord[i][1])
-        if (x[0] >= 0 && x[0] <= (columns - 1) && x[1] >= 0 && x[1] <= (rows - 1)) {
+        if (x[0] >= 0 && x[0] < columns && x[1] >= 0 && x[1] < rows) {
             x = x.join('_')
             if (!document.getElementById(x).classList.contains('display') &&
                 !document.getElementById(x).classList.contains('bomb')) {
@@ -211,7 +208,7 @@ function reveal(id) {
     }
 }
 
-function checkWin(id) {
+function checkWin() {
     if (clearedTiles == (tileList.length - bombList.length)) {
         win()
         return null
@@ -226,59 +223,43 @@ function win() {
 }
 
 function loss(id) {
+    clearInterval(timeInterval)
     for (i in bombList) {
-        document.getElementById(bombList[i]).src = 'images/bomb2.png'
+        document.getElementById(bombList[i]).src = 'images/bomb.png'
     }
-    document.getElementById(id).src = 'images/bomb.png'
+    document.getElementById(id).src = 'images/bombRed.png'
     document.getElementById('face').src = 'images/faceLoss.png'
+    document.getElementById('gamespace').removeEventListener('mousedown', faceOoo )
+    document.getElementById('gamespace').removeEventListener('mouseup', faceUp )
 
-    document.getElementById('gamespace').addEventListener('mousedown', function() { return null })
+    for (i in tileList) {
+        document.getElementById(tileList[i]).removeEventListener('click', click)
+        document.getElementById(tileList[i]).removeEventListener('contextmenu', flag)
+    }
 }
 
 function returnImage(id) {
     x = id.toString().split('_')
     x[0] = parseInt(x[0])
     x[1] = parseInt(x[1])
-    switch (numberList[((x[0]) + (x[1]*16))]) {
-        case 1:
-            imgSrc = 'images/1.png'
-            break
-        case 2:
-            imgSrc = 'images/2.png'
-            break
-        case 3:
-            imgSrc = 'images/3.png'
-            break
-        case 4:
-            imgSrc = 'images/4.png'
-            break
-        case 5:
-            imgSrc = 'images/5.png'
-            break
-        case 6:
-            imgSrc = 'images/6.png'
-            break
-        case 7:
-            imgSrc = 'images/7.png'
-            break
-        case 8:
-            imgSrc = 'images/8.png'
-            break
-        default:
-            imgSrc = 'images/empty.png'
+    if ((numberList[((x[0]) + (x[1] * (columns)))]) > 0) {
+        imgSrc = 'images/' + (numberList[((x[0]) + (x[1] * (columns)))]) + '.png'
+    }else {
+        imgSrc = 'images/empty.png'
     }
+
     return imgSrc
 }
 
-function faceDown(id) {
-    document.getElementById(id).src = 'images/faceDown.png'
+function faceDown() {
+    document.getElementById('face').src = 'images/faceDown.png'
     reset()
 }
-function faceUp(id) {
-    document.getElementById(id).src = 'images/face.png'
+function faceUp() {
+    document.getElementById('face').src = 'images/face.png'
 }
-function faceOoo(id) {
-    document.getElementById(id).src = 'images/faceOoo.png'
+function faceOoo() {
+    document.getElementById('face').src = 'images/faceOoo.png'
 }
 
 function reset() {
@@ -287,9 +268,10 @@ function reset() {
     bombList = []
     tileList = []
     clearedTiles = 0
+    flags = bombs
 
     numberList = []
-    numberList.length = 256
+    numberList.length = rows * columns
     numberList.fill(0)
 
     safe = []
@@ -297,16 +279,72 @@ function reset() {
 
     document.getElementById('gamespace').innerHTML = ''
 
+    clearInterval(timeInterval)
+    document.getElementById('time0').src = 'images/-s.png'
+    document.getElementById('time1').src = 'images/-s.png'
+    document.getElementById('time2').src = 'images/-s.png'
+
+    updateFlag()
+
     generateField()
 }
 
-time = 0
+function updateFlag() {
+    flags = flags.toString()
 
-setInterval(function() {
-    time++
+    switch (flags[flags.length - 3]) {
+        case undefined:
+            document.getElementById('flags0').src = 'images/0s.png'
+            break
+        default:
+            document.getElementById('flags0').src = 'images/' + flags[flags.length - 3] + 's.png'
+    }
+    switch (flags[flags.length - 2]) {
+        case undefined:
+            document.getElementById('flags1').src = 'images/0s.png'
+            break
+        default:
+            document.getElementById('flags1').src = 'images/' + flags[flags.length - 2] + 's.png'
+    }
+    switch (flags[flags.length - 1]) {
+        case undefined:
+            document.getElementById('flags2').src = 'images/0s.png'
+            break
+        default:
+            document.getElementById('flags2').src = 'images/' + flags[flags.length - 1] + 's.png'
+    }
+}
 
-    
-    console.log(time.toString())
-}, 1000)
+function timeStart() {
+    document.getElementById('time0').src = 'images/0s.png'
+    document.getElementById('time1').src = 'images/0s.png'
+    document.getElementById('time2').src = 'images/0s.png'
+    time = 1
+
+    timeInterval = setInterval(function() {
+        time = time.toString()
+
+        switch (time[time.length - 3]) {
+            case undefined:
+                break
+            default:
+                document.getElementById('time0').src = 'images/' + time[time.length - 3] + 's.png'
+        }
+        switch (time[time.length - 2]) {
+            case undefined:
+                break
+            default:
+                document.getElementById('time1').src = 'images/' + time[time.length - 2] + 's.png'
+        }
+        switch (time[time.length - 1]) {
+            case undefined:
+                break
+            default:
+                document.getElementById('time2').src = 'images/' + time[time.length - 1] + 's.png'
+        }
+
+        time++
+    }, 1000)
+}
 
 document.addEventListener("DOMContentLoaded", generateField())
