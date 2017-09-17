@@ -1,3 +1,44 @@
+//Pre-load assets for smooth images
+(function() {
+    let sources = [
+    'images/-s.png',
+    'images/0s.png',
+    'images/1s.png',
+    'images/2s.png',
+    'images/3s.png',
+    'images/4s.png',
+    'images/5s.png',
+    'images/6s.png',
+    'images/7s.png',
+    'images/8s.png',
+    'images/9s.png',
+    'images/1.png',
+    'images/2.png',
+    'images/3.png',
+    'images/4.png',
+    'images/5.png',
+    'images/6.png',
+    'images/7.png',
+    'images/8.png',
+    'images/bomb.png',
+    'images/bombRed.png',
+    'images/empty.png',
+    'images/face.png',
+    'images/faceDown.png',
+    'images/faceLoss.png',
+    'images/faceOoo.png',
+    'images/faceWin.png',
+    'images/flag.png',
+    'images/tile.png',
+    'images/wall.png',
+    'images/wall2.png',
+    ]
+    for (i in sources) {
+        image = document.createElement('img')
+        image.src = sources[i]
+    }
+})()
+
 // Main script
 
 const rows = 19
@@ -48,7 +89,7 @@ function generateField() {
         for (x = 0; x < columns; x++) {
 
             tile = document.createElement('img')
-            tile.src = '/Minesweeper-JS/images/tile.png'
+            tile.src = 'images/tile.png'
             tile.id = x + '_' + y
 
             tileList.push(tile.id)
@@ -152,13 +193,13 @@ function flag(event) {
         if (flagList[i] == event.target.id ) {
             flagList.splice(i, 1)
             flags++
-            document.getElementById(event.target.id).src = '/Minesweeper-JS/images/tile.png'
+            document.getElementById(event.target.id).src = 'images/tile.png'
             updateFlag()
             return null
         }
     }
     flagList.push(event.target.id)
-    document.getElementById(event.target.id).src = '/Minesweeper-JS/images/flag.png'
+    document.getElementById(event.target.id).src = 'images/flag.png'
     flags--
     updateFlag()
 }
@@ -216,18 +257,18 @@ function checkWin() {
 
 function win() {
     for (i in bombList) {
-        document.getElementById(bombList[i]).src = '/Minesweeper-JS/images/flag.png'
+        document.getElementById(bombList[i]).src = 'images/flag.png'
     }
-    document.getElementById('face').src = '/Minesweeper-JS/images/faceWin.png'
+    document.getElementById('face').src = 'images/faceWin.png'
 }
 
 function loss(id) {
     clearInterval(timeInterval)
     for (i in bombList) {
-        document.getElementById(bombList[i]).src = '/Minesweeper-JS/images/bomb.png'
+        document.getElementById(bombList[i]).src = 'images/bomb.png'
     }
-    document.getElementById(id).src = '/Minesweeper-JS/images/bombRed.png'
-    document.getElementById('face').src = '/Minesweeper-JS/images/faceLoss.png'
+    document.getElementById(id).src = 'images/bombRed.png'
+    document.getElementById('face').src = 'images/faceLoss.png'
     document.getElementById('gamespace').removeEventListener('mousedown', faceOoo )
     document.getElementById('gamespace').removeEventListener('mouseup', faceUp )
 
@@ -242,23 +283,23 @@ function returnImage(id) {
     x[0] = parseInt(x[0])
     x[1] = parseInt(x[1])
     if ((numberList[((x[0]) + (x[1] * (columns)))]) > 0) {
-        imgSrc = '/Minesweeper-JS/images/' + (numberList[((x[0]) + (x[1] * (columns)))]) + '.png'
+        imgSrc = 'images/' + (numberList[((x[0]) + (x[1] * (columns)))]) + '.png'
     }else {
-        imgSrc = '/Minesweeper-JS/images/empty.png'
+        imgSrc = 'images/empty.png'
     }
 
     return imgSrc
 }
 
 function faceDown() {
-    document.getElementById('face').src = '/Minesweeper-JS/images/faceDown.png'
+    document.getElementById('face').src = 'images/faceDown.png'
     reset()
 }
 function faceUp() {
-    document.getElementById('face').src = '/Minesweeper-JS/images/face.png'
+    document.getElementById('face').src = 'images/face.png'
 }
 function faceOoo() {
-    document.getElementById('face').src = '/Minesweeper-JS/images/faceOoo.png'
+    document.getElementById('face').src = 'images/faceOoo.png'
 }
 
 function reset() {
@@ -279,9 +320,9 @@ function reset() {
     document.getElementById('gamespace').innerHTML = ''
 
     clearInterval(timeInterval)
-    document.getElementById('time0').src = '/Minesweeper-JS/images/-s.png'
-    document.getElementById('time1').src = '/Minesweeper-JS/images/-s.png'
-    document.getElementById('time2').src = '/Minesweeper-JS/images/-s.png'
+    document.getElementById('time0').src = 'images/-s.png'
+    document.getElementById('time1').src = 'images/-s.png'
+    document.getElementById('time2').src = 'images/-s.png'
 
     updateFlag()
 
@@ -293,31 +334,31 @@ function updateFlag() {
 
     switch (flags[flags.length - 3]) {
         case undefined:
-            document.getElementById('flags0').src = '/Minesweeper-JS/images/0s.png'
+            document.getElementById('flags0').src = 'images/0s.png'
             break
         default:
-            document.getElementById('flags0').src = '/Minesweeper-JS/images/' + flags[flags.length - 3] + 's.png'
+            document.getElementById('flags0').src = 'images/' + flags[flags.length - 3] + 's.png'
     }
     switch (flags[flags.length - 2]) {
         case undefined:
-            document.getElementById('flags1').src = '/Minesweeper-JS/images/0s.png'
+            document.getElementById('flags1').src = 'images/0s.png'
             break
         default:
-            document.getElementById('flags1').src = '/Minesweeper-JS/images/' + flags[flags.length - 2] + 's.png'
+            document.getElementById('flags1').src = 'images/' + flags[flags.length - 2] + 's.png'
     }
     switch (flags[flags.length - 1]) {
         case undefined:
-            document.getElementById('flags2').src = '/Minesweeper-JS/images/0s.png'
+            document.getElementById('flags2').src = 'images/0s.png'
             break
         default:
-            document.getElementById('flags2').src = '/Minesweeper-JS/images/' + flags[flags.length - 1] + 's.png'
+            document.getElementById('flags2').src = 'images/' + flags[flags.length - 1] + 's.png'
     }
 }
 
 function timeStart() {
-    document.getElementById('time0').src = '/Minesweeper-JS/images/0s.png'
-    document.getElementById('time1').src = '/Minesweeper-JS/images/0s.png'
-    document.getElementById('time2').src = '/Minesweeper-JS/images/0s.png'
+    document.getElementById('time0').src = 'images/0s.png'
+    document.getElementById('time1').src = 'images/0s.png'
+    document.getElementById('time2').src = 'images/0s.png'
     time = 1
 
     timeInterval = setInterval(function() {
@@ -327,19 +368,19 @@ function timeStart() {
             case undefined:
                 break
             default:
-                document.getElementById('time0').src = '/Minesweeper-JS/images/' + time[time.length - 3] + 's.png'
+                document.getElementById('time0').src = 'images/' + time[time.length - 3] + 's.png'
         }
         switch (time[time.length - 2]) {
             case undefined:
                 break
             default:
-                document.getElementById('time1').src = '/Minesweeper-JS/images/' + time[time.length - 2] + 's.png'
+                document.getElementById('time1').src = 'images/' + time[time.length - 2] + 's.png'
         }
         switch (time[time.length - 1]) {
             case undefined:
                 break
             default:
-                document.getElementById('time2').src = '/Minesweeper-JS/images/' + time[time.length - 1] + 's.png'
+                document.getElementById('time2').src = 'images/' + time[time.length - 1] + 's.png'
         }
 
         time++
