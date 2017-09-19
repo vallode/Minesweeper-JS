@@ -318,8 +318,7 @@ function reset() {
     flagList = []
 
     document.getElementById('gamespace').innerHTML = ''
-
-    clearInterval(timeInterval)
+    
     document.getElementById('time0').src = 'images/-s.png'
     document.getElementById('time1').src = 'images/-s.png'
     document.getElementById('time2').src = 'images/-s.png'
