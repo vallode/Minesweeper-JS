@@ -3,6 +3,7 @@
 * {
     user-select: none;
 }
+
 html,
 body {
     margin: 0;
@@ -13,7 +14,7 @@ body {
 
     font-family: 'Open Sans', sans-serif;
     font-size: 14px;
-    color: #fff;
+    color: #f1f1f1;
 
     background-color: #333;
 }
@@ -38,20 +39,18 @@ body {
 
 .panel {
     margin: auto;
-    background-color: #212121;
-    padding: 3vh;
-    padding-top: 1vh;
+    background-color: #EEEEEE;
     border-radius: 2px;
-    box-shadow: 0px 0px 0.5vh 0 #263238;
 }
 
-.header h1 span{
-    padding: 1vh;
-    padding-left: 2vh;
-    padding-right: 2vh;
-    background-color: #424242;
-    box-shadow: 0px 0px 0.5vh 0 #263238;
-    border-radius: 2px;
+.header {
+    background-color: #F44336;
+    border-top-right-radius: 2px;
+    border-top-left-radius: 2px; 
+}
+
+.header h1 {
+    margin: 0;
 }
 
 /* Minesweeper */
@@ -62,9 +61,6 @@ body {
     border-width: 10px;
     border-image: url(../images/wall.png) 10 repeat;
 
-    background-color: #bdbdbd;
-    padding-bottom: 1px;
-    padding-right: 1px;
     display: block;
     display: flex;
     flex-direction: column;
@@ -78,7 +74,6 @@ body {
     justify-content: space-around;
     align-items: center;
     padding: 0.25vh;
-    background-color: #bdbdbd;
     border-style: solid;
     border-width: 10px;
     border-image: url(../images/wall2.png) 10 repeat;
@@ -96,7 +91,8 @@ body {
 }
 
 .game {
-    margin:auto;
+    margin: 3vh;
+    margin-top: 0;
 }
 
 #state {
