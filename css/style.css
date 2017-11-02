@@ -102,7 +102,7 @@ body {
 }
 
 #face {
-	background: url(/images/background.png);
+	background: url(../images/background.png);
 	background-size: auto;
 	background-position: 0 -55px;
 	background-repeat: no-repeat;
