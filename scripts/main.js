@@ -266,7 +266,7 @@ function loss(id) {
 	}
 	document.getElementById(id).src = 'images/bombRed.png'
 
-	objects.face.src = 'images/faceLoss.png'
+	objects.face.className = 'faceLoss'
 	objects.gamespace.removeEventListener('mousedown', faceOoo )
 	objects.gamespace.removeEventListener('mouseup', faceUp )
 
