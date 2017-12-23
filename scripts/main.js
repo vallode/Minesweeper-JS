@@ -1,4 +1,3 @@
-//Pre-load assets for smooth images
 (() => {
     let sources = [
         'images/-s.png',
@@ -30,54 +29,81 @@
         'images/background.png'
     ];
     for (let i in sources) {
-        let image = document.createElement('img')
+        let image = document.createElement('img');
         image.src = sources[i]
     }
 })();
 
-let adjecent_tiles = [[-1, -1], [0, -1], [+1, -1],
-    [-1, 0], [+1, 0],
-    [-1, +1], [0, +1], [+1, +1]]
+let rows, columns, bombs, clicks, cleared_tiles, flags = 0;
 
-let objects = {
-    face: document.getElementById('face'),
-    gamespace: document.getElementById('gamespace')
-};
+let bomb_list, tiles, number_list, safe_area, flag_list = [];
+
+let time_interval;
+
+let face = document.getElementById('face');
+let gamespace = document.getElementById('gamespace');
+
+
+function init() {
+    rows = 19;
+    columns = 30;
+    bombs = 99;
+    flags = bombs;
+
+    clicks = 0;
+    cleared_tiles = 0;
+
+    bomb_list = [];
+    tiles = [];
+    number_list = [];
+    safe_area = [];
+    flag_list = [];
+
+    number_list.length = rows * columns;
+
+    gamespace.innerHTML = '';
+    face.className = 'faceUp';
+
+    document.getElementById('time0').className = 'noneSeconds';
+    document.getElementById('time1').className = 'noneSeconds';
+    document.getElementById('time2').className = 'noneSeconds';
+
+    clearInterval(time_interval);
+
+    updateFlag();
+
+    generateField();
+
+    addListeners();
+}
+
+let adjacent_tiles = [[-1, -1], [0, -1], [+1, -1],
+    [-1, 0], [+1, 0],
+    [-1, +1], [0, +1], [+1, +1]];
 
 function addListeners() {
-    objects.gamespace.oncontextmenu = function () {
+    gamespace.oncontextmenu = function () {
         return false;
     };
 
-    objects.gamespace.addEventListener('mousedown', faceOoo);
-    objects.gamespace.addEventListener('mouseup', faceUp);
+    gamespace.addEventListener('mousedown', face.className = 'faceOoo');
+    gamespace.addEventListener('mouseup', face.className = 'faceUp');
 
-    objects.face.addEventListener('mousedown', faceDown);
-    objects.face.addEventListener('mouseup', faceUp)
+    face.addEventListener('mousedown', faceDown);
+    face.addEventListener('mouseup', face.className = 'faceUp')
 }
 
 function faceDown() {
-    objects.face.className = 'faceDown';
-    initiateVariables()
+    face.className = 'faceDown';
+    init()
 }
 
-function faceUp() {
-    objects.face.className = 'faceUp'
-}
-
-function faceOoo() {
-    objects.face.className = 'faceOoo'
-}
-
-//Generate the tile field
 function generateField() {
-    //Iterate through rows
     for (let y = 0; y < rows; y++) {
-
         let row = document.createElement('div');
         row.className = 'row';
         row.id = 'row';
-        objects.gamespace.appendChild(row);
+        gamespace.appendChild(row);
 
         for (let x = 0; x < columns; x++) {
 
@@ -85,14 +111,12 @@ function generateField() {
             tile.src = 'images/tile.png';
             tile.id = x + '_' + y;
 
-            tileList.push(tile.id);
+            tiles.push(tile.id);
 
             document.getElementById('row').appendChild(tile);
 
-            //Reveal
             document.getElementById(tile.id).addEventListener('click', click);
 
-            //Flag
             document.getElementById(tile.id).addEventListener('contextmenu', flag)
 
         }
@@ -102,24 +126,23 @@ function generateField() {
 }
 
 function generateMines(id) {
-    let bombList = [];
-    for (z = 0; z < bombs; z++) {
+    for (let z = 0; z < bombs; z++) {
         let bombId = Math.floor(Math.random() * (columns - 1)) + '_' + Math.floor(Math.random() * (rows - 1));
 
         // If a bomb has the ID as another bomb, regenerate that bomb
         bombId = bombId.toString();
-        for (let i in bombList) {
-            while (bombList[i] === bombId) {
+        for (let i in bomb_list) {
+            while (bomb_list[i] === bombId) {
                 bombId = (Math.floor(Math.random() * (columns - 1)) + '_' + (Math.floor(Math.random() * (rows - 1))))
             }
         }
-        bombList.push(bombId)
+        bomb_list.push(bombId)
     }
 
-    // If a bomb falls within the safe area, regenerate all bombs
-    for (let c in bombList) {
-        for (let f in safe) {
-            if (bombList[c] === safe[f]) {
+    // If a bomb falls within the safe_area area, regenerate all bombs
+    for (let c in bomb_list) {
+        for (let f in safe_area) {
+            if (bomb_list[c] === safe_area[f]) {
                 generateMines(id);
                 return null
             }
@@ -127,21 +150,21 @@ function generateMines(id) {
     }
 
     // For each bomb, add a value to the tiles around it
-    for (let z in bombList) {
-        addValue(bombList[z]);
-        document.getElementById(bombList[z]).classList.add('bomb')
+    for (let z in bomb_list) {
+        addValue(bomb_list[z]);
+        document.getElementById(bomb_list[z]).classList.add('bomb')
     }
 }
 
 function addValue(id) {
     //For each adjacent tile add a value to the corresponding array position
-    for (let i in adjecent_tiles) {
+    for (let i in adjacent_tiles) {
         let x = id.toString().split('_');
-        x[0] = parseInt(x[0]) + parseInt(adjecent_tiles[i][0]);
-        x[1] = parseInt(x[1]) + parseInt(adjecent_tiles[i][1]);
+        x[0] = parseInt(x[0]) + parseInt(adjacent_tiles[i][0]);
+        x[1] = parseInt(x[1]) + parseInt(adjacent_tiles[i][1]);
         if (x[0] >= 0 && x[0] < columns && x[1] >= 0 && x[1] < rows) {
             //(x) + ((columns - 1) * y)
-            numberList[(x[0]) + ((columns) * x[1])] += 1;
+            number_list[(x[0]) + ((columns) * x[1])] += 1;
             x = x.join('_');
             document.getElementById(x).classList.add('nearby')
         }
@@ -152,14 +175,14 @@ function addValue(id) {
 
 function click(event) {
     if (firstClick === true) {
-        safe.push(event.target.id);
-        for (let i in adjecent_tiles) {
+        safe_area.push(event.target.id);
+        for (let i in adjacent_tiles) {
             let x = event.target.id.toString().split('_');
-            x[0] = parseInt(x[0]) + parseInt(adjecent_tiles[i][0]);
-            x[1] = parseInt(x[1]) + parseInt(adjecent_tiles[i][1]);
+            x[0] = parseInt(x[0]) + parseInt(adjacent_tiles[i][0]);
+            x[1] = parseInt(x[1]) + parseInt(adjacent_tiles[i][1]);
             if (x[0] >= 0 && x[0] < columns && x[1] >= 0 && x[1] < rows) {
                 x = x.join('_');
-                safe.push(x)
+                safe_area.push(x)
             }
         }
 
@@ -181,30 +204,30 @@ function flag(event) {
     if (document.getElementById(event.target.id).classList.contains('display')) {
         return null
     }
-    for (let i in flagList) {
-        if (flagList[i] === event.target.id) {
-            flagList.splice(i, 1);
+    for (let i in flag_list) {
+        if (flag_list[i] === event.target.id) {
+            flag_list.splice(i, 1);
             flags++;
             document.getElementById(event.target.id).src = 'images/tile.png'
             updateFlag();
             return null
         }
     }
-    flagList.push(event.target.id)
+    flag_list.push(event.target.id)
     document.getElementById(event.target.id).src = 'images/flag.png'
     flags--;
     updateFlag()
 }
 
 function reveal(id) {
-    for (let i in flagList) {
-        if (flagList[i] === id) {
+    for (let i in flag_list) {
+        if (flag_list[i] === id) {
             return null
         }
     }
 
-    for (let i in bombList) {
-        if (bombList[i] === id) {
+    for (let i in bomb_list) {
+        if (bomb_list[i] === id) {
             loss(id);
             return null
         }
@@ -215,7 +238,7 @@ function reveal(id) {
     }
     document.getElementById(id).classList.add('display');
     document.getElementById(id).src = returnImage(id);
-    clearedTiles++;
+    cleared_tiles++;
 
     //check for empty squares
     //if square is blank empty it
@@ -226,10 +249,10 @@ function reveal(id) {
         return null
     }
 
-    for (let i in adjecent_tiles) {
+    for (let i in adjacent_tiles) {
         let x = id.toString().split('_');
-        x[0] = parseInt(x[0]) + parseInt(adjecent_tiles[i][0]);
-        x[1] = parseInt(x[1]) + parseInt(adjecent_tiles[i][1]);
+        x[0] = parseInt(x[0]) + parseInt(adjacent_tiles[i][0]);
+        x[1] = parseInt(x[1]) + parseInt(adjacent_tiles[i][1]);
         if (x[0] >= 0 && x[0] < columns && x[1] >= 0 && x[1] < rows) {
             x = x.join('_');
             if (!document.getElementById(x).classList.contains('display') &&
@@ -241,33 +264,33 @@ function reveal(id) {
 }
 
 function checkWin() {
-    if (clearedTiles === (tileList.length - bombList.length)) {
+    if (cleared_tiles === (tiles.length - bomb_list.length)) {
         win();
         return null
     }
 }
 
 function win() {
-    for (let i in bombList) {
-        document.getElementById(bombList[i]).src = 'images/flag.png'
+    for (let i in bomb_list) {
+        document.getElementById(bomb_list[i]).src = 'images/flag.png'
     }
-    objects.face.src = 'images/faceWin.png'
+    face.src = 'images/faceWin.png'
 }
 
 function loss(id) {
-    clearInterval(secondInterval);
-    for (let i in bombList) {
-        document.getElementById(bombList[i]).src = 'images/bomb.png'
+    clearInterval(time_interval);
+    for (let i in bomb_list) {
+        document.getElementById(bomb_list[i]).src = 'images/bomb.png'
     }
     document.getElementById(id).src = 'images/bombRed.png';
 
-    objects.face.className = 'faceLoss';
-    objects.gamespace.removeEventListener('mousedown', faceOoo);
-    objects.gamespace.removeEventListener('mouseup', faceUp);
+    face.className = 'faceLoss';
+    gamespace.removeEventListener('mousedown', faceOoo);
+    gamespace.removeEventListener('mouseup', faceUp);
 
-    for (let i in tileList) {
-        document.getElementById(tileList[i]).removeEventListener('click', click)
-        document.getElementById(tileList[i]).removeEventListener('contextmenu', flag)
+    for (let i in tiles) {
+        document.getElementById(tiles[i]).removeEventListener('click', click)
+        document.getElementById(tiles[i]).removeEventListener('contextmenu', flag)
     }
 }
 
@@ -277,8 +300,8 @@ function returnImage(id) {
     x[0] = parseInt(x[0]);
     x[1] = parseInt(x[1]);
 
-    if ((numberList[((x[0]) + (x[1] * (columns)))]) > 0) {
-        imgSrc = 'images/' + (numberList[((x[0]) + (x[1] * (columns)))]) + '.png'
+    if ((number_list[((x[0]) + (x[1] * (columns)))]) > 0) {
+        imgSrc = 'images/' + (number_list[((x[0]) + (x[1] * (columns)))]) + '.png'
     } else {
         imgSrc = 'images/empty.png'
     }
@@ -313,72 +336,16 @@ function updateFlag() {
 }
 
 function timeStart() {
-    document.getElementById('time0').src = 'images/0s.png';
-    document.getElementById('time1').src = 'images/0s.png';
-    document.getElementById('time2').src = 'images/0s.png';
     let time = 1;
+    time_interval = setInterval( () => {
+        time = '00' + time.toString();
 
-    secondInterval = setInterval(() => {
-        time = time.toString()
-
-        switch (time[time.length - 3]) {
-            case undefined:
-                break;
-            default:
-                document.getElementById('time0').src = 'images/' + time[time.length - 3] + 's.png'
-        }
-        switch (time[time.length - 2]) {
-            case undefined:
-                break;
-            default:
-                document.getElementById('time1').src = 'images/' + time[time.length - 2] + 's.png'
-        }
-        switch (time[time.length - 1]) {
-            case undefined:
-                break;
-            default:
-                document.getElementById('time2').src = 'images/' + time[time.length - 1] + 's.png'
-        }
+        document.getElementById('time2').src = 'images/' + time[time.length - 1] + 's.png';
+        document.getElementById('time1').src = 'images/' + time[time.length - 2] + 's.png';
+        document.getElementById('time0').src = 'images/' + time[time.length - 3] + 's.png';
 
         time++
     }, 1000)
 }
 
-function initiateVariables() {
-    rows = 19;
-    columns = 30;
-    bombs = 99;
-
-    firstClick = true;
-
-    bombList = [];
-    tileList = [];
-    numberList = [];
-    safe = [];
-    flagList = [];
-
-    clearedTiles = 0;
-    flags = bombs;
-
-    numberList.length = rows * columns;
-    numberList.fill(0);
-
-    objects.gamespace.innerHTML = '';
-    document.getElementById('time0').className = 'noneSeconds';
-    document.getElementById('time1').className = 'noneSeconds';
-    document.getElementById('time2').className = 'noneSeconds';
-
-    try {
-        clearInterval(secondInterval)
-    }
-    catch (err) {
-    }
-
-    updateFlag();
-
-    generateField();
-
-    addListeners();
-}
-
-document.addEventListener("DOMContentLoaded", initiateVariables());
+document.addEventListener('DOMContentLoaded', init);
