@@ -64,9 +64,9 @@ function init() {
     gamespace.innerHTML = '';
     face.className = 'faceUp';
 
-    document.getElementById('time0').className = 'noneSeconds';
-    document.getElementById('time1').className = 'noneSeconds';
-    document.getElementById('time2').className = 'noneSeconds';
+    document.getElementById('time0').setAttribute('time', '-');
+    document.getElementById('time1').setAttribute('time', '-');
+    document.getElementById('time2').setAttribute('time', '-');
 
     clearInterval(time_interval);
 
@@ -340,9 +340,9 @@ function timeStart() {
     time_interval = setInterval( () => {
         time = '00' + time.toString();
 
-        document.getElementById('time2').src = 'images/' + time[time.length - 1] + 's.png';
-        document.getElementById('time1').src = 'images/' + time[time.length - 2] + 's.png';
-        document.getElementById('time0').src = 'images/' + time[time.length - 3] + 's.png';
+        document.getElementById('time2').setAttribute('time', time[time.length - 1]);
+        document.getElementById('time1').setAttribute('time', time[time.length - 2]);
+        document.getElementById('time0').setAttribute('time', time[time.length - 3]);
 
         time++
     }, 1000)

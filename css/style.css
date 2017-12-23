@@ -82,12 +82,12 @@ body {
     transform: translate(0, 10px);
 }
 
-#time img {
+#time div {
     display: inline-flex;
     float: left;
 }
 
-#flags img {
+#flags div {
     display: inline-flex;
     float: left;
 }
@@ -110,6 +110,15 @@ body {
     height: 26px;
 }
 
+[time] {
+    background: url('../images/background.png');
+    background-size: auto;
+    background-position: 0 -55px;
+    background-repeat: no-repeat;
+    width: 13px;
+    height: 23px;
+}
+
 .faceDown {
     background-position: -26px -55px !important;
 }
@@ -126,8 +135,48 @@ body {
     background-position: 0px -55px !important;
 }
 
-.noneSeconds {
-    background-position: -130px 0px !important;
+[time='-'] {
+    background-position: -130px 0 !important;
+}
+
+[time='0'] {
+    background-position: 0 0 !important;
+}
+
+[time='1'] {
+    background-position: -13px 0 !important;
+}
+
+[time='2'] {
+    background-position: -26px 0 !important;
+}
+
+[time='3'] {
+    background-position: -39px 0 !important;
+}
+
+[time='4'] {
+    background-position: -52px 0 !important;
+}
+
+[time='5'] {
+    background-position: -65px 0 !important;
+}
+
+[time='6'] {
+    background-position: -78px 0 !important;
+}
+
+[time='7'] {
+    background-position: -91px 0 !important;
+}
+
+[time='8'] {
+    background-position: -104px 0 !important;
+}
+
+[time='9'] {
+    background-position: -117px 0 !important;
 }
 
 .row {
