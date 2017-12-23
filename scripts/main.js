@@ -1,16 +1,5 @@
 (() => {
     let sources = [
-        'images/-s.png',
-        'images/0s.png',
-        'images/1s.png',
-        'images/2s.png',
-        'images/3s.png',
-        'images/4s.png',
-        'images/5s.png',
-        'images/6s.png',
-        'images/7s.png',
-        'images/8s.png',
-        'images/9s.png',
         'images/1.png',
         'images/2.png',
         'images/3.png',
@@ -70,7 +59,7 @@ function init() {
 
     clearInterval(time_interval);
 
-    updateFlag();
+    update_flags();
 
     generateField();
 
@@ -122,7 +111,7 @@ function generateField() {
         }
         row.id = ''
     }
-    updateFlag()
+    update_flags()
 }
 
 function generateMines(id) {
@@ -190,7 +179,7 @@ function click(event) {
 
         reveal(event.target.id);
 
-        timeStart();
+        start_time();
 
         firstClick = false
     } else {
@@ -209,14 +198,14 @@ function flag(event) {
             flag_list.splice(i, 1);
             flags++;
             document.getElementById(event.target.id).src = 'images/tile.png'
-            updateFlag();
+            update_flags();
             return null
         }
     }
     flag_list.push(event.target.id)
     document.getElementById(event.target.id).src = 'images/flag.png'
     flags--;
-    updateFlag()
+    update_flags()
 }
 
 function reveal(id) {
@@ -309,33 +298,15 @@ function returnImage(id) {
     return imgSrc
 }
 
-function updateFlag() {
-    flags = flags.toString();
+function update_flags() {
+    flags = '00' + flags.toString();
 
-    switch (flags[flags.length - 3]) {
-        case undefined:
-            document.getElementById('flags0').src = 'images/0s.png';
-            break;
-        default:
-            document.getElementById('flags0').src = 'images/' + flags[flags.length - 3] + 's.png'
-    }
-    switch (flags[flags.length - 2]) {
-        case undefined:
-            document.getElementById('flags1').src = 'images/0s.png';
-            break;
-        default:
-            document.getElementById('flags1').src = 'images/' + flags[flags.length - 2] + 's.png'
-    }
-    switch (flags[flags.length - 1]) {
-        case undefined:
-            document.getElementById('flags2').src = 'images/0s.png';
-            break;
-        default:
-            document.getElementById('flags2').src = 'images/' + flags[flags.length - 1] + 's.png'
-    }
+    document.getElementById('flags2').setAttribute('time', flags[flags.length - 1]);
+    document.getElementById('flags1').setAttribute('time', flags[flags.length - 2]);
+    document.getElementById('flags0').setAttribute('time', flags[flags.length - 3]);
 }
 
-function timeStart() {
+function start_time() {
     let time = 1;
     time_interval = setInterval( () => {
         time = '00' + time.toString();
