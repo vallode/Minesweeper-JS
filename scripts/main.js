@@ -192,7 +192,7 @@ function flag(event) {
     }
     flagList.push(event.target.id)
     document.getElementById(event.target.id).src = 'images/flag.png'
-    flags--
+    flags--;
     updateFlag()
 }
 
@@ -287,7 +287,7 @@ function returnImage(id) {
 }
 
 function updateFlag() {
-    let flags = flags.toString();
+    flags = flags.toString();
 
     switch (flags[flags.length - 3]) {
         case undefined:
