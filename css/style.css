@@ -57,15 +57,22 @@ body {
 
 #gamespace {
     margin: auto;
-    border-style: solid;
-    border-width: 10px;
+    border: solid 10px;
     border-image: url('../images/wall.png') 10 repeat;
 
-    display: block;
     display: flex;
     flex-direction: column;
 
     z-index: 0;
+}
+
+#gamespace div {
+    width: 100%;
+}
+
+#gamespace div div {
+    height: 16px;
+    width: 16px;
 }
 
 #panel {
@@ -125,6 +132,10 @@ body {
     background-position: -52px -55px !important;
 }
 
+.faceWin {
+    background-position: -104px -55px !important;
+}
+
 .faceLoss {
     background-position: -78px -55px !important;
 }
@@ -134,7 +145,57 @@ body {
 }
 
 .tile {
-    background-position: 0 -55px !important;
+    background: url('../images/background.png');
+    background-size: auto;
+    background-repeat: no-repeat;
+    background-position: 0 -39px !important;
+}
+
+.flag {
+    background: url('../images/background.png');
+    background-size: auto;
+    background-repeat: no-repeat;
+    background-position: -16px -39px !important;
+}
+
+.tile_down {
+    background-position: 0 -23px !important;
+}
+
+[nearby='none'] {
+    background-position: 0 -23px !important;
+}
+
+[nearby='1'] {
+    background-position: -16px -23px !important;
+}
+
+[nearby='2'] {
+    background-position: -32px -23px !important;
+}
+
+[nearby='3'] {
+    background-position: -48px -23px !important;
+}
+
+[nearby='4'] {
+    background-position: -64px -23px !important;
+}
+
+[nearby='5'] {
+    background-position: -80px -23px !important;
+}
+
+[nearby='6'] {
+    background-position: -96px -23px !important;
+}
+
+[nearby='7'] {
+    background-position: -110px -23px !important;
+}
+
+[nearby='8'] {
+    background-position: -126px -23px !important;
 }
 
 [time='-'] {
@@ -195,5 +256,16 @@ body {
 .nearby {
 }
 
-.bomb {
+.bomb-reveal-red {
+    background: url('../images/background.png');
+    background-size: auto;
+    background-repeat: no-repeat;
+    background-position: -32px -39px !important;
+}
+
+.bomb-reveal {
+    background: url('../images/background.png');
+    background-size: auto;
+    background-repeat: no-repeat;
+    background-position: -64px -39px !important;
 }

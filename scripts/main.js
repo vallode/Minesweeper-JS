@@ -1,28 +1,3 @@
-(() => {
-    let sources = [
-        'images/1.png',
-        'images/2.png',
-        'images/3.png',
-        'images/4.png',
-        'images/5.png',
-        'images/6.png',
-        'images/7.png',
-        'images/8.png',
-        'images/bomb.png',
-        'images/bombRed.png',
-        'images/empty.png',
-        'images/flag.png',
-        'images/tile.png',
-        'images/wall.png',
-        'images/wall2.png',
-        'images/background.png'
-    ];
-    for (let i in sources) {
-        let image = document.createElement('img');
-        image.src = sources[i]
-    }
-})();
-
 let rows, columns, bombs, clicks, cleared_tiles, flags = 0;
 
 let bomb_list, tiles, number_list, safe_area, flag_list = [];
@@ -74,7 +49,7 @@ let adjacent_tiles = [
 ];
 
 function addListeners() {
-    console.log('adding list')
+    console.log('adding list');
 
     gamespace.addEventListener('mousedown', change_face);
     gamespace.addEventListener('mouseup', change_face);
@@ -108,9 +83,8 @@ function generateField() {
 
         for (let x = 0; x < columns; x++) {
 
-            let tile = document.createElement('img');
-            tile.className = 'tile'
-            tile.src = 'images/tile.png';
+            let tile = document.createElement('div');
+            tile.className = 'tile';
             tile.id = x + '_' + y;
 
             tiles.push(tile.id);
@@ -212,13 +186,16 @@ function flag(event) {
         if (flag_list[i] === event.target.id) {
             flag_list.splice(i, 1);
             flags++;
-            document.getElementById(event.target.id).src = 'images/tile.png';
+            document.getElementById(event.target.id).classList.toggle('flag');
             update_flags();
             return null
         }
     }
-    flag_list.push(event.target.id)
-    document.getElementById(event.target.id).src = 'images/flag.png';
+    if (flags <= 0) {
+        return null
+    }
+    flag_list.push(event.target.id);
+    document.getElementById(event.target.id).classList.toggle('flag');
     flags--;
     update_flags()
 }
@@ -242,7 +219,7 @@ function reveal(id) {
     }
 
     document.getElementById(id).classList.add('display');
-    document.getElementById(id).src = returnImage(id);
+    document.getElementById(id).setAttribute('nearby', return_nearby(id));
     cleared_tiles++;
 
     //check for empty squares
@@ -250,7 +227,7 @@ function reveal(id) {
     //if square has no number empty the squares around it
 
     if (document.getElementById(id).classList.contains('nearby')) {
-        document.getElementById(id).src = returnImage(id);
+        document.getElementById(id).setAttribute('nearby', return_nearby(id));
         return null
     }
 
@@ -277,17 +254,17 @@ function checkWin() {
 
 function win() {
     for (let i in bomb_list) {
-        document.getElementById(bomb_list[i]).src = 'images/flag.png'
+        document.getElementById(bomb_list[i]).className = 'flag';
     }
-    face.src = 'images/faceWin.png'
+    face.className = 'faceWin';
 }
 
 function loss(id) {
     clearInterval(time_interval);
     for (let x = 0; x < bomb_list.length; x++) {
-        document.getElementById(bomb_list[x]).src = 'images/bomb.png'
+        document.getElementById(bomb_list[x]).className = 'bomb-reveal';
     }
-    document.getElementById(id).src = 'images/bombRed.png';
+    document.getElementById(id).className = 'bomb-reveal-red';
 
     face.className = 'faceLoss';
     gamespace.removeEventListener('mousedown', change_face);
@@ -299,19 +276,19 @@ function loss(id) {
     }
 }
 
-function returnImage(id) {
+function return_nearby(id) {
     let x = id.toString().split('_');
-    let imgSrc = '';
+    let nearby;
     x[0] = parseInt(x[0]);
     x[1] = parseInt(x[1]);
 
     if ((number_list[((x[0]) + (x[1] * (columns)))]) > 0) {
-        imgSrc = 'images/' + (number_list[((x[0]) + (x[1] * (columns)))]) + '.png'
+        nearby = number_list[((x[0]) + (x[1] * (columns)))]
     } else {
-        imgSrc = 'images/empty.png'
+        nearby = 'none'
     }
 
-    return imgSrc
+    return nearby
 }
 
 function update_flags() {
