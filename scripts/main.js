@@ -294,8 +294,8 @@ function loss(id) {
     gamespace.removeEventListener('mouseup', change_face);
 
     for (let x = 0; x < tiles.length; x++) {
-        document.getElementById(tiles[i]).removeEventListener('click', click);
-        document.getElementById(tiles[i]).removeEventListener('contextmenu', flag);
+        document.getElementById(tiles[x]).removeEventListener('click', click);
+        document.getElementById(tiles[x]).removeEventListener('contextmenu', flag);
     }
 }
 
