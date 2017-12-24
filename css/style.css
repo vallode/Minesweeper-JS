@@ -44,12 +44,19 @@ body {
 }
 
 .header {
+    display: flex;
+    align-items: center;
     background-color: #F44336;
     border-top-right-radius: 2px;
     border-top-left-radius: 2px;
 }
 
+.header input {
+    height: 100%;
+}
+
 .header h1 {
+    flex: 1;
     margin: 0;
 }
 

@@ -9,8 +9,8 @@ let gamespace = document.getElementById('gamespace');
 
 
 function init() {
-    rows = 19;
-    columns = 30;
+    rows = document.getElementById('rows').value;
+    columns = document.getElementById('columns').value;
     bombs = 99;
     flags = bombs;
 
