@@ -11,7 +11,7 @@ let gamespace = document.getElementById('gamespace');
 function init() {
     rows = document.getElementById('rows').value;
     columns = document.getElementById('columns').value;
-    bombs = 99;
+    bombs = document.getElementById('bombs').value;
     flags = bombs;
 
     clicks = 0;
