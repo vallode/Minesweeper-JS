@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css?family=Roboto');
-
 * {
     user-select: none;
 }
@@ -132,7 +130,11 @@ body {
 }
 
 .faceUp {
-    background-position: 0px -55px !important;
+    background-position: 0 -55px !important;
+}
+
+.tile {
+    background-position: 0 -55px !important;
 }
 
 [time='-'] {

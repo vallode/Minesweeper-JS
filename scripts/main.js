@@ -49,6 +49,7 @@ function init() {
     flag_list = [];
 
     number_list.length = rows * columns;
+    number_list.fill(0);
 
     gamespace.innerHTML = '';
     face.className = 'faceUp';
@@ -66,20 +67,23 @@ function init() {
     addListeners();
 }
 
-let adjacent_tiles = [[-1, -1], [0, -1], [+1, -1],
-    [-1, 0], [+1, 0],
-    [-1, +1], [0, +1], [+1, +1]];
+let adjacent_tiles = [
+[-1, -1],  [0, -1],    [+1, -1],
+[-1, 0],               [+1, 0],
+[-1, +1],  [0, +1],    [+1, +1]
+];
 
 function addListeners() {
+    console.log('adding list')
     gamespace.oncontextmenu = function () {
         return false;
     };
 
-    gamespace.addEventListener('mousedown', face.className = 'faceOoo');
-    gamespace.addEventListener('mouseup', face.className = 'faceUp');
+    gamespace.addEventListener('mousedown', () => { face.className = 'faceOoo' });
+    gamespace.addEventListener('mouseup', () => { face.className = 'faceUp' });
 
     face.addEventListener('mousedown', faceDown);
-    face.addEventListener('mouseup', face.className = 'faceUp')
+    face.addEventListener('mouseup', () => { face.className = 'faceUp' });
 }
 
 function faceDown() {
@@ -88,6 +92,7 @@ function faceDown() {
 }
 
 function generateField() {
+    console.log('Generating field')
     for (let y = 0; y < rows; y++) {
         let row = document.createElement('div');
         row.className = 'row';
@@ -97,6 +102,7 @@ function generateField() {
         for (let x = 0; x < columns; x++) {
 
             let tile = document.createElement('img');
+            tile.className = 'tile'
             tile.src = 'images/tile.png';
             tile.id = x + '_' + y;
 
@@ -114,56 +120,59 @@ function generateField() {
     update_flags()
 }
 
-function generateMines(id) {
-    for (let z = 0; z < bombs; z++) {
-        let bombId = Math.floor(Math.random() * (columns - 1)) + '_' + Math.floor(Math.random() * (rows - 1));
+function random_mine() {
+    return Math.floor(Math.random() * (columns)) + '_' + Math.floor(Math.random() * (rows));
+}
 
-        // If a bomb has the ID as another bomb, regenerate that bomb
-        bombId = bombId.toString();
-        for (let i in bomb_list) {
-            while (bomb_list[i] === bombId) {
-                bombId = (Math.floor(Math.random() * (columns - 1)) + '_' + (Math.floor(Math.random() * (rows - 1))))
+function generate_mines(id) {
+    console.log('Generating mines');
+
+    for (let x = 0; x < bombs; x++) {
+        console.log(`Generating mine ${x}`);
+        let bomb_id = random_mine();
+
+        for (let y = 0; y < bomb_list.length; y++) {
+            while (bomb_list[y] === bomb_id.toString()) {
+                console.log(`Regenerating duplicate mine ${bomb_list[y]}`);
+                bomb_id = random_mine()
             }
         }
-        bomb_list.push(bombId)
+        bomb_list.push(bomb_id)
     }
 
-    // If a bomb falls within the safe_area area, regenerate all bombs
-    for (let c in bomb_list) {
-        for (let f in safe_area) {
-            if (bomb_list[c] === safe_area[f]) {
-                generateMines(id);
-                return null
+    for (let x = 0; x < bomb_list.length; x++) {
+        for (let y = 0; y < safe_area.length; y++) {
+            while (bomb_list[x] === safe_area[y]) {
+                console.log(`Regenerating mine ${bomb_list[x]}`);
+                bomb_list[x] = random_mine()
             }
         }
     }
 
-    // For each bomb, add a value to the tiles around it
-    for (let z in bomb_list) {
-        addValue(bomb_list[z]);
-        document.getElementById(bomb_list[z]).classList.add('bomb')
+    for (let x = 0; x < bomb_list.length; x++) {
+        addValue(bomb_list[x]);
+        document.getElementById(bomb_list[x]).classList.add('bomb')
     }
 }
 
 function addValue(id) {
-    //For each adjacent tile add a value to the corresponding array position
-    for (let i in adjacent_tiles) {
-        let x = id.toString().split('_');
-        x[0] = parseInt(x[0]) + parseInt(adjacent_tiles[i][0]);
-        x[1] = parseInt(x[1]) + parseInt(adjacent_tiles[i][1]);
-        if (x[0] >= 0 && x[0] < columns && x[1] >= 0 && x[1] < rows) {
-            //(x) + ((columns - 1) * y)
-            number_list[(x[0]) + ((columns) * x[1])] += 1;
-            x = x.join('_');
-            document.getElementById(x).classList.add('nearby')
+    for (let x = 0; x < adjacent_tiles.length; x++) {
+        let i = id.toString().split('_');
+
+        i[0] = parseInt(i[0]) + parseInt(adjacent_tiles[x][0]);
+        i[1] = parseInt(i[1]) + parseInt(adjacent_tiles[x][1]);
+
+        if (i[0] >= 0 && i[0] < columns && i[1] >= 0 && i[1] < rows) {
+            number_list[(i[0]) + ((columns) * i[1])] += 1;
+            console.log(number_list[(i[0]) + ((columns) * i[1])]);
+            i = i.join('_');
+            document.getElementById(i).classList.add('nearby')
         }
     }
 }
 
-// Listeners
-
 function click(event) {
-    if (firstClick === true) {
+    if (clicks === 0) {
         safe_area.push(event.target.id);
         for (let i in adjacent_tiles) {
             let x = event.target.id.toString().split('_');
@@ -175,18 +184,17 @@ function click(event) {
             }
         }
 
-        generateMines(event.target.id);
+        generate_mines(event.target.id);
 
         reveal(event.target.id);
 
         start_time();
-
-        firstClick = false
     } else {
         reveal(event.target.id);
 
         checkWin(event.target.id)
     }
+    clicks++
 }
 
 function flag(event) {
@@ -209,22 +217,23 @@ function flag(event) {
 }
 
 function reveal(id) {
-    for (let i in flag_list) {
-        if (flag_list[i] === id) {
+    if (document.getElementById(id).classList.contains('display')) {
+        return null
+    }
+
+    for (let flag in flag_list) {
+        if (flag_list[flag] === id) {
             return null
         }
     }
 
-    for (let i in bomb_list) {
-        if (bomb_list[i] === id) {
+    for (let bomb in bomb_list) {
+        if (bomb_list[bomb] === id) {
             loss(id);
             return null
         }
     }
 
-    if (document.getElementById(id).classList.contains('display')) {
-        return null
-    }
     document.getElementById(id).classList.add('display');
     document.getElementById(id).src = returnImage(id);
     cleared_tiles++;
