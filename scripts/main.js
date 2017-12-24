@@ -75,19 +75,18 @@ let adjacent_tiles = [
 
 function addListeners() {
     console.log('adding list')
-    gamespace.oncontextmenu = function () {
-        return false;
-    };
 
     gamespace.addEventListener('mousedown', change_face);
     gamespace.addEventListener('mouseup', change_face);
+    gamespace.addEventListener('contextmenu', function (e) { e.preventDefault() });
 
     face.addEventListener('mousedown', faceDown);
     face.addEventListener('mouseup', () => { face.className = 'faceUp' });
+
 }
 
 function change_face(event) {
-    if (event.type === 'mousedown') {
+    if (event.type === 'mousedown' && event.button === 0) {
         face.className = 'faceOoo';
     } else {
         face.className = 'faceUp';
@@ -294,7 +293,7 @@ function loss(id) {
     gamespace.removeEventListener('mousedown', change_face);
     gamespace.removeEventListener('mouseup', change_face);
 
-    for (let i in tiles) {
+    for (let x = 0; x < tiles.length; x++) {
         document.getElementById(tiles[i]).removeEventListener('click', click);
         document.getElementById(tiles[i]).removeEventListener('contextmenu', flag);
     }
