@@ -79,11 +79,19 @@ function addListeners() {
         return false;
     };
 
-    gamespace.addEventListener('mousedown', () => { face.className = 'faceOoo' });
-    gamespace.addEventListener('mouseup', () => { face.className = 'faceUp' });
+    gamespace.addEventListener('mousedown', change_face);
+    gamespace.addEventListener('mouseup', change_face);
 
     face.addEventListener('mousedown', faceDown);
     face.addEventListener('mouseup', () => { face.className = 'faceUp' });
+}
+
+function change_face(event) {
+    if (event.type === 'mousedown') {
+        face.className = 'faceOoo';
+    } else {
+        face.className = 'faceUp';
+    }
 }
 
 function faceDown() {
@@ -205,13 +213,13 @@ function flag(event) {
         if (flag_list[i] === event.target.id) {
             flag_list.splice(i, 1);
             flags++;
-            document.getElementById(event.target.id).src = 'images/tile.png'
+            document.getElementById(event.target.id).src = 'images/tile.png';
             update_flags();
             return null
         }
     }
     flag_list.push(event.target.id)
-    document.getElementById(event.target.id).src = 'images/flag.png'
+    document.getElementById(event.target.id).src = 'images/flag.png';
     flags--;
     update_flags()
 }
@@ -277,18 +285,18 @@ function win() {
 
 function loss(id) {
     clearInterval(time_interval);
-    for (let i in bomb_list) {
-        document.getElementById(bomb_list[i]).src = 'images/bomb.png'
+    for (let x = 0; x < bomb_list.length; x++) {
+        document.getElementById(bomb_list[x]).src = 'images/bomb.png'
     }
     document.getElementById(id).src = 'images/bombRed.png';
 
     face.className = 'faceLoss';
-    gamespace.removeEventListener('mousedown', faceOoo);
-    gamespace.removeEventListener('mouseup', faceUp);
+    gamespace.removeEventListener('mousedown', change_face);
+    gamespace.removeEventListener('mouseup', change_face);
 
     for (let i in tiles) {
-        document.getElementById(tiles[i]).removeEventListener('click', click)
-        document.getElementById(tiles[i]).removeEventListener('contextmenu', flag)
+        document.getElementById(tiles[i]).removeEventListener('click', click);
+        document.getElementById(tiles[i]).removeEventListener('contextmenu', flag);
     }
 }
 
