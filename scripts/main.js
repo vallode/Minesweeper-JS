@@ -5,7 +5,7 @@ let bomb_list, tiles, number_list, safe_area, flag_list = [];
 let time_interval;
 
 let face = document.getElementById('face');
-let gamespace = document.getElementById('gamespace');
+let game_space = document.getElementById('gamespace');
 
 
 function init() {
@@ -26,7 +26,7 @@ function init() {
     number_list.length = rows * columns;
     number_list.fill(0);
 
-    gamespace.innerHTML = '';
+    game_space.innerHTML = '';
     face.className = 'faceUp';
 
     document.getElementById('time0').setAttribute('time', '-');
@@ -37,9 +37,9 @@ function init() {
 
     update_flags();
 
-    generateField();
+    generate_field();
 
-    addListeners();
+    add_listeners();
 }
 
 let adjacent_tiles = [
@@ -48,10 +48,10 @@ let adjacent_tiles = [
 [-1, +1],  [0, +1],    [+1, +1]
 ];
 
-function addListeners() {
-    gamespace.addEventListener('mousedown', change_face);
-    gamespace.addEventListener('mouseup', change_face);
-    gamespace.addEventListener('contextmenu', function (e) { e.preventDefault() });
+function add_listeners() {
+    game_space.addEventListener('mousedown', change_face);
+    game_space.addEventListener('mouseup', change_face);
+    game_space.addEventListener('contextmenu', function (e) { e.preventDefault() });
 
     face.addEventListener('mousedown', face_down);
     face.addEventListener('click', init);
@@ -76,13 +76,13 @@ function face_up() {
     face.removeEventListener('mouseleave', face_up);
 }
 
-function generateField() {
+function generate_field() {
 
     for (let y = 0; y < rows; y++) {
         let row = document.createElement('div');
         row.className = 'row';
         row.id = 'row';
-        gamespace.appendChild(row);
+        game_space.appendChild(row);
 
         for (let x = 0; x < columns; x++) {
 
@@ -129,12 +129,12 @@ function generate_mines(id) {
     }
 
     for (let x = 0; x < bomb_list.length; x++) {
-        addValue(bomb_list[x]);
+        add_value(bomb_list[x]);
         document.getElementById(bomb_list[x]).classList.add('bomb')
     }
 }
 
-function addValue(id) {
+function add_value(id) {
     for (let x = 0; x < adjacent_tiles.length; x++) {
         let i = id.toString().split('_');
 
@@ -170,7 +170,7 @@ function click(event) {
     } else {
         reveal(event.target.id);
 
-        checkWin(event.target.id)
+        check_win(event.target.id)
     }
     clicks++
 }
@@ -242,14 +242,14 @@ function reveal(id) {
     }
 }
 
-function checkWin() {
+function check_win() {
     if (cleared_tiles === (tiles.length - bomb_list.length)) {
         for (let i in bomb_list) {
             document.getElementById(bomb_list[i]).className = 'flag';
         }
         face.className = 'faceWin';
-        gamespace.removeEventListener('mousedown', change_face);
-        gamespace.removeEventListener('mouseup', change_face);
+        game_space.removeEventListener('mousedown', change_face);
+        game_space.removeEventListener('mouseup', change_face);
     } else {
         return false
     }
@@ -263,8 +263,8 @@ function loss(id) {
     document.getElementById(id).className = 'bomb-reveal-red';
 
     face.className = 'faceLoss';
-    gamespace.removeEventListener('mousedown', change_face);
-    gamespace.removeEventListener('mouseup', change_face);
+    game_space.removeEventListener('mousedown', change_face);
+    game_space.removeEventListener('mouseup', change_face);
 
     for (let x = 0; x < tiles.length; x++) {
         document.getElementById(tiles[x]).removeEventListener('click', click);
