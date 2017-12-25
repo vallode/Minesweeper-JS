@@ -55,8 +55,8 @@ function addListeners() {
     gamespace.addEventListener('mouseup', change_face);
     gamespace.addEventListener('contextmenu', function (e) { e.preventDefault() });
 
-    face.addEventListener('mousedown', faceDown);
-    face.addEventListener('mouseup', () => { face.className = 'faceUp' });
+    face.addEventListener('mousedown', face_down);
+    face.addEventListener('click', init);
 
 }
 
@@ -68,9 +68,14 @@ function change_face(event) {
     }
 }
 
-function faceDown() {
-    face.className = 'faceDown';
-    init()
+function face_down() {
+    face.className = 'face_down';
+    face.addEventListener('mouseleave', face_up);
+}
+
+function face_up() {
+    face.className = 'faceUp';
+    face.removeEventListener('mouseleave', face_up);
 }
 
 function generateField() {
