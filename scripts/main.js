@@ -244,16 +244,15 @@ function reveal(id) {
 
 function checkWin() {
     if (cleared_tiles === (tiles.length - bomb_list.length)) {
-        win();
-        return null
+        for (let i in bomb_list) {
+            document.getElementById(bomb_list[i]).className = 'flag';
+        }
+        face.className = 'faceWin';
+        gamespace.removeEventListener('mousedown', change_face);
+        gamespace.removeEventListener('mouseup', change_face);
+    } else {
+        return false
     }
-}
-
-function win() {
-    for (let i in bomb_list) {
-        document.getElementById(bomb_list[i]).className = 'flag';
-    }
-    face.className = 'faceWin';
 }
 
 function loss(id) {
