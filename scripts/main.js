@@ -49,8 +49,6 @@ let adjacent_tiles = [
 ];
 
 function addListeners() {
-    console.log('adding list');
-
     gamespace.addEventListener('mousedown', change_face);
     gamespace.addEventListener('mouseup', change_face);
     gamespace.addEventListener('contextmenu', function (e) { e.preventDefault() });
@@ -79,7 +77,7 @@ function face_up() {
 }
 
 function generateField() {
-    console.log('Generating field')
+
     for (let y = 0; y < rows; y++) {
         let row = document.createElement('div');
         row.className = 'row';
@@ -111,15 +109,11 @@ function random_mine() {
 }
 
 function generate_mines(id) {
-    console.log('Generating mines');
-
     for (let x = 0; x < bombs; x++) {
-        console.log(`Generating mine ${x}`);
         let bomb_id = random_mine();
 
         for (let y = 0; y < bomb_list.length; y++) {
             while (bomb_list[y] === bomb_id.toString()) {
-                console.log(`Regenerating duplicate mine ${bomb_list[y]}`);
                 bomb_id = random_mine()
             }
         }
@@ -129,7 +123,6 @@ function generate_mines(id) {
     for (let x = 0; x < bomb_list.length; x++) {
         for (let y = 0; y < safe_area.length; y++) {
             while (bomb_list[x] === safe_area[y]) {
-                console.log(`Regenerating mine ${bomb_list[x]}`);
                 bomb_list[x] = random_mine()
             }
         }
@@ -150,7 +143,6 @@ function addValue(id) {
 
         if (i[0] >= 0 && i[0] < columns && i[1] >= 0 && i[1] < rows) {
             number_list[(i[0]) + ((columns) * i[1])] += 1;
-            console.log(number_list[(i[0]) + ((columns) * i[1])]);
             i = i.join('_');
             document.getElementById(i).classList.add('nearby')
         }
