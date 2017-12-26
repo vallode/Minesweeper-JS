@@ -47,9 +47,14 @@ body {
 .header {
     display: flex;
     align-items: center;
+    flex-direction: column;
     background-color: #F44336;
     border-top-right-radius: 2px;
     border-top-left-radius: 2px;
+}
+
+.options {
+    display: flex;
 }
 
 .header ruby {
@@ -87,9 +92,6 @@ body {
     z-index: 0;
 }
 
-#gamespace div {
-    width: 100%;
-}
 
 #gamespace div div {
     height: 16px;

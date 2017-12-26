@@ -296,7 +296,7 @@ function update_flags() {
 }
 
 function start_time() {
-    let time = 1;
+    let time = 0;
     time_interval = setInterval( () => {
         time = '00' + time.toString();
 
