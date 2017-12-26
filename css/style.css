@@ -77,8 +77,8 @@ body {
 /* Minesweeper */
 
 #gamespace {
-    margin: auto;
     border: solid 10px;
+    border-top: 0;
     border-image: url('../images/wall.png') 10 repeat;
 
     display: flex;
@@ -97,15 +97,13 @@ body {
 }
 
 #panel {
-    margin: auto;
     display: flex;
     justify-content: space-around;
     align-items: center;
-    padding: 0.25vh;
-    border-style: solid;
-    border-width: 10px;
+
+    padding: 0.25vh 0 0.25vh 0;
+    border: solid 10px;
     border-image: url('../images/wall2.png') 10 repeat;
-    transform: translate(0, 10px);
 }
 
 #time div {
@@ -120,7 +118,9 @@ body {
 
 .game {
     margin: 3vh;
-    margin-top: 0;
+
+    display: flex;
+    flex-direction: column;
 }
 
 #state {
@@ -128,19 +128,15 @@ body {
 }
 
 #face {
-    background: url('../images/background.png');
+    background: url('../images/background.png') 0 -55px no-repeat;
     background-size: auto;
-    background-position: 0 -55px;
-    background-repeat: no-repeat;
     width: 26px;
     height: 26px;
 }
 
 [time] {
-    background: url('../images/background.png');
+    background: url('../images/background.png') 0 -55px no-repeat;
     background-size: auto;
-    background-position: 0 -55px;
-    background-repeat: no-repeat;
     width: 13px;
     height: 23px;
 }
